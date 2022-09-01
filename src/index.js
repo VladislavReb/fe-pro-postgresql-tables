@@ -34,14 +34,14 @@ export const createStructure = async () => {
   await client.query(`
     create table categories (
     id         SERIAL PRIMARY KEY,
-    name       VARCHAR(30) NOT NULL,
+    name       VARCHAR(30) NOT NULL
     )
   `);
 
   await client.query(`
     create table authors (
     id         SERIAL PRIMARY KEY,
-    name       VARCHAR(30) NOT NULL,
+    name       VARCHAR(30) NOT NULL
     )
   `);
 
@@ -85,7 +85,14 @@ export const createItems = async () => {
   const client = initConnection();
   client.connect();
 
-  // Your code is here...
+  await client.query(`
+    INSERT INTO users (name) VALUES ('Bohdan');
+    INSERT INTO categories (name) VALUES ('horror');
+    INSERT INTO authors (name) VALUES ('Stephen King');
+    INSERT INTO books (title, userid, authorid, categoryid) VALUES ('It', 1, 1, 1);
+    INSERT INTO descriptions (description, bookid) VALUES ('Must read', 1);
+    INSERT INTO reviews (message, userid, bookid) VALUES ('Good', 1, 1);
+    `);
 
   client.end();
 };
