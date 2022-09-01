@@ -11,9 +11,9 @@ export const initConnection = () => {
   const client = new Client({
     user: POSTGRES_USER || 'postgres',
     host: POSTGRES_HOST || 'localhost',
-    database: POSTGRES_DB || 'postgres',
-    password: POSTGRES_PASSWORD || 'postgres',
-    port: POSTGRES_PORT || 5556,
+    database: POSTGRES_DB || 'local_data',
+    password: POSTGRES_PASSWORD || 'Ro19mD92_PG',
+    port: POSTGRES_PORT || 5432,
   });
 
   return client;
@@ -23,8 +23,60 @@ export const createStructure = async () => {
   const client = initConnection();
   client.connect();
 
-  // Your code is here...
-  // Your code is here...
+  await client.query(`
+    create table users (
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(30) NOT NULL,
+    date       TIMESTAMP DEFAULT NOW()
+    )
+  `);
+
+  await client.query(`
+    create table categories (
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(30) NOT NULL,
+    )
+  `);
+
+  await client.query(`
+    create table authors (
+    id         SERIAL PRIMARY KEY,
+    name       VARCHAR(30) NOT NULL,
+    )
+  `);
+
+  await client.query(`
+    create table books(
+    id         SERIAL PRIMARY KEY,
+    title      VARCHAR(30) NOT NULL,
+    userid     INTEGER     NOT NULL,
+    authorid   INTEGER     NOT NULL,
+    categoryid INTEGER     NOT NULL,
+    FOREIGN KEY(userid) REFERENCES users (id) on delete cascade,
+    FOREIGN KEY(authorid) REFERENCES authors (id) on delete cascade,
+    FOREIGN KEY(categoryid) REFERENCES categories (id) on delete cascade
+    )
+  `);
+
+  await client.query(`
+    create table descriptions(
+    id          SERIAL PRIMARY KEY,
+    description VARCHAR(10000) NOT NULL,
+    bookid      INTEGER NOT NULL,
+    FOREIGN KEY(bookid) REFERENCES books (id) on delete cascade
+    )
+  `);
+
+  await client.query(`
+    create table reviews(
+    id          SERIAL PRIMARY KEY,
+    message     VARCHAR(10000) NOT NULL,
+    userid      INTEGER NOT NULL,
+    bookid      INTEGER NOT NULL,
+    FOREIGN KEY(userid) REFERENCES users (id) on delete cascade,
+    FOREIGN KEY(bookid) REFERENCES books (id) on delete cascade
+    )
+  `);
 
   client.end();
 };
